@@ -8,8 +8,9 @@ import (
 	"github.com/spf13/cobra"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
-	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -33,15 +34,23 @@ func run(kubeconfigPath string, screen, stderr io.Writer) error {
 		return fmt.Errorf("failed to build configuration: %w", err)
 	}
 
-	clientset, err := kubernetes.NewForConfig(config)
+	clientset, err := dynamic.NewForConfig(config)
 	if err != nil {
 		return fmt.Errorf("failed to create clientset: %w", err)
 	}
 
+	gitopsRepoCRD := clientset.Resource(
+		schema.GroupVersionResource{
+			Group:    "kubefirst.konstruct.io",
+			Version:  "v1beta1",
+			Resource: "GitopsCatalog",
+		},
+	)
 	// list all pods
-	watcher, err := clientset.CoreV1().Pods("default").Watch(context.TODO(), metav1.ListOptions{})
+
+	watcher, err := gitopsRepoCRD.Watch(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		return fmt.Errorf("failed to list pods: %w", err)
+		return fmt.Errorf("failed to list catalog repos: %w", err)
 	}
 	defer watcher.Stop()
 
