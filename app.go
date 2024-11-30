@@ -39,7 +39,7 @@ func run(kubeconfigPath string, screen, stderr io.Writer) error {
 	}
 
 	// list all pods
-	watcher, err := clientset.CoreV1().Pods("").Watch(context.TODO(), metav1.ListOptions{})
+	watcher, err := clientset.CoreV1().Pods("default").Watch(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to list pods: %w", err)
 	}

@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -41,8 +43,16 @@ func onModify(client kubernetes.Interface, screen io.Writer, pod *v1.Pod) {
 		return
 	}
 
-	pod.ObjectMeta.Finalizers = newFinalizers
-	updated, err := client.CoreV1().Pods(pod.Namespace).Update(context.TODO(), pod, metav1.UpdateOptions{})
+	patch := map[string]interface{}{
+		"metadata": map[string]interface{}{
+			"finalizers": newFinalizers,
+		},
+	}
+	patchJson, err := json.Marshal(patch)
+	if err != nil {
+		fmt.Fprintf(screen, "Unable to marshal string: %s", err)
+	}
+	updated, err := client.CoreV1().Pods(pod.Namespace).Patch(context.TODO(), pod.Name, types.MergePatchType, patchJson, metav1.PatchOptions{})
 	if err != nil {
 		fmt.Fprintf(screen, "Failed to update pod: %v\n", err)
 		return
