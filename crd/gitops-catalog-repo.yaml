@@ -1,7 +1,7 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: gitops-catalog.kubefirst.konstruct.io
+  name: gitopscatalogrepo.kubefirst.konstruct.io
 spec:
   group: kubefirst.konstruct.io
   scope: Namespaced
@@ -10,7 +10,7 @@ spec:
     singular: gitops-catalog
     kind: GitopsCatalog
   versions:
-    - name: betav1
+    - name: v1beta1
       served: true
       #
       storage: true

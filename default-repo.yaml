@@ -1,4 +1,4 @@
-apiVersion: kubefirst.konstruct.io/betav1
+apiVersion: kubefirst.konstruct.io/v1beta1
 kind: GitopsCatalog
 metadata:
   name: default
