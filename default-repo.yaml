@@ -1,0 +1,7 @@
+apiVersion: kubefirst.konstruct.io/betav1
+kind: GitopsCatalog
+metadata:
+  name: default
+spec:
+  repository: https://github.com/konstructio/gitops-catalog/
+  branch: main
